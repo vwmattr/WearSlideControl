@@ -33,6 +33,7 @@ public class PresentationListenerService extends WearableListenerService {
     private static final String EXTRA_INDEX = "pageIndex";
     private static final int ID_PRESENTATION = 999;
     private static final byte CONTROL_FWD_MSG = 0;
+    private static final byte CONTROL_PREV_MSG = 1;
 
     private GoogleApiClient mGoogleApiClient;
 

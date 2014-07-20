@@ -13,15 +13,19 @@ import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
+
+import java.util.concurrent.Executor;
 
 
 /**
  * The Main presentation view for the Mobile side of this example.  Displays a ViewPager with fodder
  * content that the user will be able to control either on the mobile or the wearable.
  */
-public class SlidePresentationActivity extends Activity {
+public class SlidePresentationActivity extends Activity implements MessageApi.MessageListener {
 
     private static final String TAG = SlidePresentationActivity.class.getSimpleName();
 
@@ -29,7 +33,8 @@ public class SlidePresentationActivity extends Activity {
      * The number of pages (wizard steps) to show in this demo.
      */
     private static final int NUM_PAGES = 5;
-
+    private static final byte CONTROL_FWD_MSG = 0;
+    private static final byte CONTROL_PREV_MSG = 1;
     private static final String EXTRA_INDEX = "pageIndex";
 
     private ViewPager mPager;
@@ -54,6 +59,7 @@ public class SlidePresentationActivity extends Activity {
                 .addApi(Wearable.API)
                 .build();
         mGoogleApiClient.connect();
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     private void setupPageChangeListener() {
@@ -99,6 +105,41 @@ public class SlidePresentationActivity extends Activity {
      */
     private int getCurrentIndex() {
         return mPager.getCurrentItem();
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.i(TAG, "Received messageEvent : " + messageEvent.getPath());
+
+        if ("/control".equals(messageEvent.getPath())) {
+            switch (messageEvent.getData()[0]) {
+                case CONTROL_FWD_MSG:
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            advanceSlide();
+                        }
+                    });
+                    break;
+                case CONTROL_PREV_MSG:
+                    //Not yet supported...
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Helper method to advance the displayed slide
+     */
+    private void advanceSlide() {
+        int currIndex = getCurrentIndex();
+        int totalSlides = mPager.getChildCount();
+        if (currIndex <= totalSlides) {
+            mPager.setCurrentItem(currIndex+1);
+        } else {
+            mPager.setCurrentItem(0);
+        }
     }
 
     /**
