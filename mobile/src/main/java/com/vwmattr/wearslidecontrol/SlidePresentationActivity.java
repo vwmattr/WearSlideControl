@@ -15,6 +15,8 @@ import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
@@ -54,12 +56,51 @@ public class SlidePresentationActivity extends Activity implements MessageApi.Me
         setupPageChangeListener();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        updateDataItem();
+    }
+
+    @Override
+    protected void onPause() {
+
+        Log.i(TAG, "on Paused()");
+
+        new AsyncTask() {
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                NodeApi.GetConnectedNodesResult nodes =
+                        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+
+                byte[] message = new byte[1];
+                for (Node node : nodes.getNodes()) {
+                    Wearable.MessageApi.sendMessage(mGoogleApiClient,
+                            node.getId(), "/stopIt", message);
+                    Log.i(TAG, "Sent stopIt message to node: " + node.getId());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                Wearable.MessageApi.removeListener(mGoogleApiClient, SlidePresentationActivity.this);
+                mGoogleApiClient.disconnect();
+            }
+
+        }.execute();
+
+        super.onPause();
+    }
+
     private void setupGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
-        mGoogleApiClient.connect();
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     private void setupPageChangeListener() {

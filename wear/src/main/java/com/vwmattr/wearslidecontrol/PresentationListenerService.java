@@ -14,13 +14,12 @@ import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -44,6 +43,7 @@ public class PresentationListenerService extends WearableListenerService {
                 .addApi(Wearable.API)
                 .build();
         mGoogleApiClient.connect();
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     //Notification for Data items
@@ -58,6 +58,17 @@ public class PresentationListenerService extends WearableListenerService {
                    handleStateChanged(event);
                }
             }
+        }
+    }
+
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        Log.i(TAG, "Received messageEvent : " + messageEvent.getPath());
+
+        if ("/stopIt".equals(messageEvent.getPath())) {
+            Log.i(TAG, "StopIt command received!");
+            hideNotification();
         }
     }
 
@@ -118,4 +129,8 @@ public class PresentationListenerService extends WearableListenerService {
         }.execute();
     }
 
+    public void hideNotification() {
+        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.cancelAll();
+    }
 }
