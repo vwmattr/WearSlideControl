@@ -1,4 +1,5 @@
 .gradle/
 .idea/
-WearSlideControl.iml
 build/
+*.iml
+**/*.iml
