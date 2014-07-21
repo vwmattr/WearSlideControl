@@ -22,6 +22,9 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.List;
 
+import static com.vwmattr.wearslidecontrol.common.Constants.CONTROL_FWD_MSG;
+import static com.vwmattr.wearslidecontrol.common.Constants.EXTRA_INDEX;
+
 /**
  * Created by Matty on 7/20/14.
  */
@@ -29,10 +32,7 @@ public class PresentationListenerService extends WearableListenerService {
 
     private static final String TAG = PresentationListenerService.class.getSimpleName();
 
-    private static final String EXTRA_INDEX = "pageIndex";
     private static final int ID_PRESENTATION = 999;
-    private static final byte CONTROL_FWD_MSG = 0;
-    private static final byte CONTROL_PREV_MSG = 1;
 
     private GoogleApiClient mGoogleApiClient;
 

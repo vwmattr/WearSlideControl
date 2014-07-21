@@ -20,7 +20,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-import java.util.concurrent.Executor;
+import static com.vwmattr.wearslidecontrol.common.Constants.EXTRA_INDEX;
 
 
 /**
@@ -37,7 +37,6 @@ public class SlidePresentationActivity extends Activity implements MessageApi.Me
     private static final int NUM_PAGES = 5;
     private static final byte CONTROL_FWD_MSG = 0;
     private static final byte CONTROL_PREV_MSG = 1;
-    private static final String EXTRA_INDEX = "pageIndex";
 
     private ViewPager mPager;
 
@@ -70,7 +69,6 @@ public class SlidePresentationActivity extends Activity implements MessageApi.Me
         Log.i(TAG, "on Paused()");
 
         new AsyncTask() {
-
             @Override
             protected Object doInBackground(Object[] params) {
                 NodeApi.GetConnectedNodesResult nodes =
